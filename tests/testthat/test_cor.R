@@ -2,30 +2,33 @@ context("clustify")
 
 test_that("output is correctly formatted", {
   res <- clustify(
-           expr_mat = pbmc4k_matrix,
-           metadata = pbmc4k_meta,
-           bulk_mat = pbmc_bulk_matrix,
-           query_genes = pbmc4k_vargenes,
-           cluster_col = "cluster"
+    expr_mat = pbmc4k_matrix,
+    metadata = pbmc4k_meta,
+    bulk_mat = pbmc_bulk_matrix,
+    query_genes = pbmc4k_vargenes,
+    cluster_col = "cluster"
   )
   n_clusters <- length(unique(pbmc4k_meta$cluster))
   n_bulk_samples <- ncol(pbmc_bulk_matrix)
 
   expect_equal(ncol(res), n_bulk_samples)
   expect_equal(n_clusters, nrow(res))
-  })
+})
 
 test_that("run all correlation functions", {
-  results <- lapply(clustifyr_methods,
-         function(x) {
-           clustify(
-           expr_mat = pbmc4k_matrix,
-    metadata = pbmc4k_meta,
-    bulk_mat = pbmc_bulk_matrix,
-    query_genes = pbmc4k_vargenes,
-    cluster_col = "cluster",
-    compute_method = x
-  )})
+  results <- lapply(
+    clustifyr_methods,
+    function(x) {
+      clustify(
+        expr_mat = pbmc4k_matrix,
+        metadata = pbmc4k_meta,
+        bulk_mat = pbmc_bulk_matrix,
+        query_genes = pbmc4k_vargenes,
+        cluster_col = "cluster",
+        compute_method = x
+      )
+    }
+  )
   nrows <- lapply(results, nrow) %>% unlist()
   ncols <- lapply(results, ncol) %>% unlist()
 
@@ -57,7 +60,6 @@ test_that("test per cell", {
 })
 
 test_that("test permutation", {
-
   res1 <- clustify(
     expr_mat = pbmc4k_matrix,
     metadata = pbmc4k_meta,

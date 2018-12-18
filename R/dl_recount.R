@@ -1,9 +1,19 @@
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(stringr)
-library(recount)
-
+#' dl_recount
+#'
+#' @param sra_id ID of SRA study to download
+#'
+#' @importFrom recount download_study scale_counts
+#' @importFrom SummarizedExperiment assay rowData colData
+#' @importFrom dplyr mutate select mutate_at left_join group_by summarise filter
+#' @importFrom stringr str_match str_c
+#' @importFrom purrr map_chr
+#' @importFrom tidyr separate spread gather
+#' @importFrom tibble data_frame rownames_to_column column_to_rownames
+#'
+#' @return
+#' @export dl_recount
+#'
+#' @examples
 dl_recount <- function(sra_id){
   download_study(sra_id)
   load(file.path(sra_id, "rse_gene.Rdata"))
@@ -29,9 +39,9 @@ dl_recount <- function(sra_id){
                       all_data = as.list(mdata$characteristics)) %>%
     mutate(out = purrr::map_chr(all_data,
                                 ~str_c(.x, collapse = "::"))) %>%
-  tidyr::separate(out,
-                  sep = "::",
-                  into = mdata_cols) %>%
+  separate(out,
+           sep = "::",
+           into = mdata_cols) %>%
     select(-all_data) %>%
     mutate_at(.vars = vars(-matches("run")),
               .funs = function(x) str_match(x, ": (.+)")[, 2])
@@ -48,23 +58,23 @@ dl_recount <- function(sra_id){
 
   out_df <- read_counts %>%
     as.data.frame() %>%
-    tibble::rownames_to_column("gene_id") %>%
+    rownames_to_column("gene_id") %>%
     left_join(., row_ids_to_symbols,
               by = c("gene_id" = "ids")) %>%
-    dplyr::select(-gene_id) %>%
-    dplyr::select(symbols, everything()) %>%
+    select(-gene_id) %>%
+    select(symbols, everything()) %>%
     filter(!is.na(symbols))
 
-  out_matrix <- tidyr::gather(out_df, library, expr, -symbols) %>%
+  out_matrix <- gather(out_df, library, expr, -symbols) %>%
     group_by(symbols, library) %>%
-    summarize(expr = sum(expr)) %>%
-    tidyr::spread(library, expr) %>%
+    summarise(expr = sum(expr)) %>%
+    spread(library, expr) %>%
     as.data.frame() %>%
-    tibble::column_to_rownames("symbols") %>%
+    column_to_rownames("symbols") %>%
     as.matrix()
 
-  list(read_counts = out_matrix,
-       meta_data = mdata)
+  list(readcounts = out_matrix,
+       metadata = mdata)
 }
 
 

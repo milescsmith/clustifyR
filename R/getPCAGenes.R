@@ -16,6 +16,7 @@
 #' top point 1 percent of genes with the largest loadings.
 #' @return The list of genes to use as features.
 #'
+#' @importFrom irlba prcomp_irlba
 #' @export
 getPCAGenes <- function(
                         sc_avg_expr,
@@ -29,7 +30,7 @@ getPCAGenes <- function(
   bulkrna <- log(bulkrna + 1)
 
   # Get the PCs
-  pca <- prcomp(t(bulkrna))
+  pca <- prcomp_irlba(t(bulkrna))
 
   # For the given number PCs, select the genes with the largest loadings
   genes <- c()

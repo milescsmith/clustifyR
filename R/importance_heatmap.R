@@ -1,14 +1,16 @@
 #' Heatmap of average expression of most predictive genes across cell types
 #'
-#' @param importance importance measurements of genes (predictors)
+#' @param important important measurements of genes (predictors)
 #' from the random forest model
 #' @param avg_matrix average expression matrix
 #' @param meta contains cluster info and classified cell types
 #' @param MDA_thresh MeanDecreaseAccuracy threshold
 #' @param MDG_thresh MeanDecreaseGini threshold
 #'
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
 #' @export
-importance_heatmap <- function(importance, avg_matrix, meta,
+importance_heatmap <- function(important, avg_matrix, meta,
                                MDA_thresh, MDG_thresh) {
 
   # Index contains cluster numbers and classified cell types
@@ -16,7 +18,7 @@ importance_heatmap <- function(importance, avg_matrix, meta,
 
   # A list of genes that are most predictive of cell types
   gene_list <- rownames(important[(important$MeanDecreaseAccuracy >= MDA_thresh &
-                                     important$MeanDecreaseGini >= MDG_thresh), ])
+    important$MeanDecreaseGini >= MDG_thresh), ])
 
   # Reduce the average expression matrix
   avg_matrix <- avg_matrix[rownames(avg_matrix) %in% gene_list, ]
@@ -30,7 +32,7 @@ importance_heatmap <- function(importance, avg_matrix, meta,
   log_mat <- as.matrix(log(avg_matrix + 1))
   bk1 <- seq(min(log_mat), max(log_mat), length.out = 11)
   colorCount <- ncol(log_mat)
-  getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "Blues"))
+  getPalette <- colorRampPalette(brewer.pal(9, "Blues"))
   color <- getPalette(colorCount)
 
   heatmap(

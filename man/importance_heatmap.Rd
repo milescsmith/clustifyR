@@ -4,10 +4,10 @@
 \alias{importance_heatmap}
 \title{Heatmap of average expression of most predictive genes across cell types}
 \usage{
-importance_heatmap(importance, avg_matrix, meta, MDA_thresh, MDG_thresh)
+importance_heatmap(important, avg_matrix, meta, MDA_thresh, MDG_thresh)
 }
 \arguments{
-\item{importance}{importance measurements of genes (predictors)
+\item{important}{important measurements of genes (predictors)
 from the random forest model}
 
 \item{avg_matrix}{average expression matrix}
